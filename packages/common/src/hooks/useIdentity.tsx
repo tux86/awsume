@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { STSClient, GetCallerIdentityCommand } from "@aws-sdk/client-sts";
+import { getAwsEnv, getCallerIdentity, parseIdentityArn } from "../aws.js";
 
 export interface AwsIdentity {
   accountId: string;
@@ -14,31 +14,6 @@ export interface UseIdentityResult {
   loading: boolean;
   error: string | null;
   refresh: () => void;
-}
-
-function getAwsEnv() {
-  return {
-    profile: process.env.AWS_PROFILE || "default",
-    region: process.env.AWS_REGION || process.env.AWS_DEFAULT_REGION || "us-east-1",
-  };
-}
-
-function parseIdentityArn(arn: string): { name: string; type: string } {
-  // arn:aws:iam::123456789:user/username
-  // arn:aws:sts::123456789:assumed-role/role-name/session
-  const parts = arn.split(":");
-  const resource = parts[5] || "";
-
-  if (resource.startsWith("user/")) {
-    return { type: "User", name: resource.replace("user/", "") };
-  }
-
-  if (resource.startsWith("assumed-role/")) {
-    const roleParts = resource.replace("assumed-role/", "").split("/");
-    return { type: "Role", name: roleParts[1] || roleParts[0] };
-  }
-
-  return { type: "Unknown", name: resource };
 }
 
 export function useIdentity(): UseIdentityResult {
@@ -58,19 +33,18 @@ export function useIdentity(): UseIdentityResult {
 
       try {
         const env = getAwsEnv();
-        const client = new STSClient({ region: env.region });
-        const response = await client.send(new GetCallerIdentityCommand({}));
+        const caller = await getCallerIdentity();
 
         if (cancelled) return;
 
-        const parsed = parseIdentityArn(response.Arn || "");
+        const parsed = parseIdentityArn(caller.arn);
 
         setIdentity({
-          accountId: response.Account || "Unknown",
-          profile: env.profile,
-          region: env.region,
+          accountId: caller.accountId,
+          profile: env.profile || "default",
+          region: env.region || "us-east-1",
           role: parsed.name,
-          arn: response.Arn || "",
+          arn: caller.arn,
         });
       } catch (err) {
         if (cancelled) return;

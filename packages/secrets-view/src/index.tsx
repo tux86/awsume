@@ -123,18 +123,22 @@ function SecretDetail({ secret, onBack, fetchSecretValue }: SecretDetailProps) {
   const { exit } = useApp();
 
   useEffect(() => {
+    let cancelled = false;
     fetchSecretValue(secret.arn).then((v) => {
-      setValue(v);
-      setLoading(false);
+      if (!cancelled) {
+        setValue(v);
+        setLoading(false);
+      }
     });
+    return () => { cancelled = true; };
   }, [secret.arn, fetchSecretValue]);
 
-  // Handle keyboard for copy
-  useInput((input) => {
+  // Handle keyboard for copy and back
+  useInput((input, key) => {
     if (input === "c" && value) {
       copy(value);
     }
-    if (input === "b") {
+    if (input === "b" || key.escape) {
       onBack();
     }
   });

@@ -75,11 +75,9 @@ async function execCommand(command: string, args: string[]): Promise<string> {
 }
 
 function getBasename(path: string): string {
-  // Extract just the executable name from full path
   const parts = path.split("/");
   let name = parts[parts.length - 1] || path;
 
-  // Handle .app bundles - get the app name
   const appMatch = path.match(/\/([^/]+)\.app\//);
   if (appMatch) {
     name = appMatch[1];
@@ -197,8 +195,12 @@ async function killProcess(
 // Hooks
 // ─────────────────────────────────────────────────────────────────────────────
 
-function useCombinedData(autoRefresh: boolean, refreshInterval: number = 2000) {
-  const [processes, setProcesses] = useState<ProcessInfo[]>([]);
+function useAutoRefreshData<T>(
+  fetchFn: () => Promise<T>,
+  autoRefresh: boolean,
+  refreshInterval: number = 2000
+) {
+  const [data, setData] = useState<T | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -207,14 +209,13 @@ function useCombinedData(autoRefresh: boolean, refreshInterval: number = 2000) {
     if (showLoading) setLoading(true);
     setError(null);
     try {
-      const procs = await getProcessesWithPorts();
-      setProcesses(procs);
+      setData(await fetchFn());
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to get processes");
+      setError(err instanceof Error ? err.message : "Failed to fetch data");
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [fetchFn]);
 
   useEffect(() => {
     refresh();
@@ -235,60 +236,25 @@ function useCombinedData(autoRefresh: boolean, refreshInterval: number = 2000) {
     };
   }, [autoRefresh, refreshInterval, refresh]);
 
-  return { processes, loading, error, refresh: () => refresh(true) };
-}
-
-function usePorts(autoRefresh: boolean, refreshInterval: number = 2000) {
-  const [ports, setPorts] = useState<PortInfo[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
-
-  const refresh = useCallback(async (showLoading = true) => {
-    if (showLoading) setLoading(true);
-    setError(null);
-    try {
-      const portList = await getPorts();
-      setPorts(portList);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to get ports");
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    refresh();
-  }, [refresh]);
-
-  useEffect(() => {
-    if (autoRefresh) {
-      intervalRef.current = setInterval(() => refresh(false), refreshInterval);
-    } else if (intervalRef.current) {
-      clearInterval(intervalRef.current);
-      intervalRef.current = null;
-    }
-
-    return () => {
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-      }
-    };
-  }, [autoRefresh, refreshInterval, refresh]);
-
-  return { ports, loading, error, refresh: () => refresh(true) };
+  return { data, loading, error, refresh: () => refresh(true) };
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Components
 // ─────────────────────────────────────────────────────────────────────────────
 
-function ProcessDetailView({
-  process,
+function DetailView({
+  title,
+  titleColor,
+  info,
+  pid,
   onBack,
   onRefresh,
 }: {
-  process: ProcessInfo;
+  title: string;
+  titleColor: string;
+  info: React.ReactNode;
+  pid: number;
   onBack: () => void;
   onRefresh: () => void;
 }) {
@@ -299,10 +265,10 @@ function ProcessDetailView({
 
   const handleKill = async (force: boolean) => {
     const signal = force ? "KILL" : "TERM";
-    const success = await killProcess(process.pid, signal);
+    const success = await killProcess(pid, signal);
     const message = success
-      ? `${force ? "Force killed" : "Killed"} ${process.name} (${process.pid})`
-      : `Failed to kill ${process.name}`;
+      ? `${force ? "Force killed" : "Killed"} ${title} (PID ${pid})`
+      : `Failed to kill ${title}`;
 
     setStatus({ type: success ? "success" : "error", message });
 
@@ -317,60 +283,63 @@ function ProcessDetailView({
   };
 
   const menuItems: ListItemData[] = [
-    {
-      id: "kill",
-      label: "Kill (SIGTERM)",
-      value: "term",
-    },
-    {
-      id: "force",
-      label: "Force Kill (SIGKILL)",
-      value: "kill",
-    },
-    {
-      id: "back",
-      label: "Back",
-      value: "back",
-    },
+    { id: "kill", label: "Kill (SIGTERM)", value: "term" },
+    { id: "force", label: "Force Kill (SIGKILL)", value: "kill" },
+    { id: "back", label: "Back", value: "back" },
   ];
 
   const handleSelect = (item: ListItemData) => {
-    if (item.value === "term") {
-      handleKill(false);
-    } else if (item.value === "kill") {
-      handleKill(true);
-    } else {
-      onBack();
-    }
+    if (item.value === "term") handleKill(false);
+    else if (item.value === "kill") handleKill(true);
+    else onBack();
   };
 
   useInput((input, key) => {
-    if (input === "b" || key.escape) {
-      onBack();
-    }
+    if (input === "b" || key.escape) onBack();
   });
 
   return (
     <Box flexDirection="column" gap={1}>
-      <Box flexDirection="column" borderStyle="round" borderColor="magenta" paddingX={1}>
-        <Text bold color="magenta">{process.name}</Text>
-        <Text>PID: <Text color="cyan">{process.pid}</Text></Text>
-        <Text>CPU: <Text color="yellow">{process.cpu}</Text>  MEM: <Text color="yellow">{process.mem}</Text></Text>
-        <Text>User: <Text color="gray">{process.user}</Text></Text>
-        {process.ports.length > 0 && (
-          <Text>Ports: <Text color="green">:{process.ports.join(", :")}</Text></Text>
-        )}
-        <Text dimColor>Path: {process.command}</Text>
+      <Box flexDirection="column" borderStyle="round" borderColor={titleColor} paddingX={1}>
+        <Text bold color={titleColor}>{title}</Text>
+        {info}
       </Box>
       {status && (
         <StatusMessage type={status.type}>{status.message}</StatusMessage>
       )}
-      <List
-        items={menuItems}
-        onSelect={handleSelect}
-        maxVisible={3}
-      />
+      <List items={menuItems} onSelect={handleSelect} maxVisible={3} />
     </Box>
+  );
+}
+
+function ProcessDetailView({
+  process,
+  onBack,
+  onRefresh,
+}: {
+  process: ProcessInfo;
+  onBack: () => void;
+  onRefresh: () => void;
+}) {
+  return (
+    <DetailView
+      title={process.name}
+      titleColor="magenta"
+      pid={process.pid}
+      onBack={onBack}
+      onRefresh={onRefresh}
+      info={
+        <>
+          <Text>PID: <Text color="cyan">{process.pid}</Text></Text>
+          <Text>CPU: <Text color="yellow">{process.cpu}</Text>  MEM: <Text color="yellow">{process.mem}</Text></Text>
+          <Text>User: <Text color="gray">{process.user}</Text></Text>
+          {process.ports.length > 0 && (
+            <Text>Ports: <Text color="green">:{process.ports.join(", :")}</Text></Text>
+          )}
+          <Text dimColor>Path: {process.command}</Text>
+        </>
+      }
+    />
   );
 }
 
@@ -383,82 +352,22 @@ function PortDetailView({
   onBack: () => void;
   onRefresh: () => void;
 }) {
-  const [status, setStatus] = useState<{
-    type: "success" | "error";
-    message: string;
-  } | null>(null);
-
-  const handleKill = async (force: boolean) => {
-    const signal = force ? "KILL" : "TERM";
-    const success = await killProcess(port.pid, signal);
-    const message = success
-      ? `${force ? "Force killed" : "Killed"} :${port.port} (${port.name})`
-      : `Failed to kill process on port ${port.port}`;
-
-    setStatus({ type: success ? "success" : "error", message });
-
-    if (success) {
-      setTimeout(() => {
-        onRefresh();
-        onBack();
-      }, 800);
-    } else {
-      setTimeout(() => setStatus(null), 2000);
-    }
-  };
-
-  const menuItems: ListItemData[] = [
-    {
-      id: "kill",
-      label: "Kill (SIGTERM)",
-      value: "term",
-    },
-    {
-      id: "force",
-      label: "Force Kill (SIGKILL)",
-      value: "kill",
-    },
-    {
-      id: "back",
-      label: "Back",
-      value: "back",
-    },
-  ];
-
-  const handleSelect = (item: ListItemData) => {
-    if (item.value === "term") {
-      handleKill(false);
-    } else if (item.value === "kill") {
-      handleKill(true);
-    } else {
-      onBack();
-    }
-  };
-
-  useInput((input, key) => {
-    if (input === "b" || key.escape) {
-      onBack();
-    }
-  });
-
   return (
-    <Box flexDirection="column" gap={1}>
-      <Box flexDirection="column" borderStyle="round" borderColor="green" paddingX={1}>
-        <Text bold color="green">:{port.port}</Text>
-        <Text>Process: <Text color="magenta">{port.name}</Text></Text>
-        <Text>PID: <Text color="cyan">{port.pid}</Text></Text>
-        <Text>Protocol: <Text color="gray">{port.protocol}</Text></Text>
-        <Text>State: <Text color="yellow">{port.state}</Text></Text>
-      </Box>
-      {status && (
-        <StatusMessage type={status.type}>{status.message}</StatusMessage>
-      )}
-      <List
-        items={menuItems}
-        onSelect={handleSelect}
-        maxVisible={3}
-      />
-    </Box>
+    <DetailView
+      title={`:${port.port}`}
+      titleColor="green"
+      pid={port.pid}
+      onBack={onBack}
+      onRefresh={onRefresh}
+      info={
+        <>
+          <Text>Process: <Text color="magenta">{port.name}</Text></Text>
+          <Text>PID: <Text color="cyan">{port.pid}</Text></Text>
+          <Text>Protocol: <Text color="gray">{port.protocol}</Text></Text>
+          <Text>State: <Text color="yellow">{port.state}</Text></Text>
+        </>
+      }
+    />
   );
 }
 
@@ -475,17 +384,22 @@ function CombinedView({
   onSwitchView: () => void;
   onSelectProcess: (proc: ProcessInfo) => void;
 }) {
-  const { processes, loading, error, refresh } = useCombinedData(autoRefresh);
+  const { data: processes, loading, error, refresh } = useAutoRefreshData(
+    getProcessesWithPorts,
+    autoRefresh
+  );
 
-  const filtered = filter
-    ? processes.filter(
-        (p) =>
-          p.name.toLowerCase().includes(filter.toLowerCase()) ||
-          p.pid.toString().includes(filter) ||
-          p.user.toLowerCase().includes(filter.toLowerCase()) ||
-          p.ports.some((port) => port.toString().includes(filter))
-      )
-    : processes;
+  const filtered = processes
+    ? filter
+      ? processes.filter(
+          (p) =>
+            p.name.toLowerCase().includes(filter.toLowerCase()) ||
+            p.pid.toString().includes(filter) ||
+            p.user.toLowerCase().includes(filter.toLowerCase()) ||
+            p.ports.some((port) => port.toString().includes(filter))
+        )
+      : processes
+    : [];
 
   const items: ListItemData[] = filtered.map((proc) => {
     const portsStr = proc.ports.length > 0 ? `:${proc.ports.join(",")}` : "-";
@@ -504,11 +418,8 @@ function CombinedView({
   });
 
   useInput((input) => {
-    if (input === "a") {
-      onToggleAutoRefresh();
-    } else if (input === "p") {
-      onSwitchView();
-    }
+    if (input === "a") onToggleAutoRefresh();
+    else if (input === "p") onSwitchView();
   });
 
   if (error) {
@@ -557,16 +468,21 @@ function PortsView({
   onSwitchView: () => void;
   onSelectPort: (port: PortInfo) => void;
 }) {
-  const { ports, loading, error, refresh } = usePorts(autoRefresh);
+  const { data: ports, loading, error, refresh } = useAutoRefreshData(
+    getPorts,
+    autoRefresh
+  );
 
-  const filtered = filter
-    ? ports.filter(
-        (p) =>
-          p.name.toLowerCase().includes(filter.toLowerCase()) ||
-          p.port.toString().includes(filter) ||
-          p.pid.toString().includes(filter)
-      )
-    : ports;
+  const filtered = ports
+    ? filter
+      ? ports.filter(
+          (p) =>
+            p.name.toLowerCase().includes(filter.toLowerCase()) ||
+            p.port.toString().includes(filter) ||
+            p.pid.toString().includes(filter)
+        )
+      : ports
+    : [];
 
   const items: ListItemData[] = filtered.map((port) => {
     const portStr = `:${port.port}`.padEnd(8);
@@ -582,11 +498,8 @@ function PortsView({
   });
 
   useInput((input) => {
-    if (input === "a") {
-      onToggleAutoRefresh();
-    } else if (input === "p") {
-      onSwitchView();
-    }
+    if (input === "a") onToggleAutoRefresh();
+    else if (input === "p") onSwitchView();
   });
 
   if (error) {
@@ -667,15 +580,11 @@ function ProcManager() {
   const [autoRefresh, setAutoRefresh] = useState(false);
   const [selectedProcess, setSelectedProcess] = useState<ProcessInfo | null>(null);
   const [selectedPort, setSelectedPort] = useState<PortInfo | null>(null);
-  const [refreshTrigger, setRefreshTrigger] = useState(0);
-
-  const triggerRefresh = useCallback(() => {
-    setRefreshTrigger((n) => n + 1);
-  }, []);
+  const [refreshKey, setRefreshKey] = useState(0);
 
   const toggleView = useCallback(() => {
     setView((v) => {
-      if (v === "detail") return v; // Don't toggle from detail view
+      if (v === "detail") return v;
       return v === "combined" ? "ports" : "combined";
     });
   }, []);
@@ -699,6 +608,7 @@ function ProcManager() {
   const handleBackFromDetail = useCallback(() => {
     setSelectedProcess(null);
     setSelectedPort(null);
+    setRefreshKey((k) => k + 1);
     setView(prevView);
   }, [prevView]);
 
@@ -769,7 +679,7 @@ function ProcManager() {
     >
       {view === "combined" && (
         <CombinedView
-          key={refreshTrigger}
+          key={refreshKey}
           filter={filter}
           autoRefresh={autoRefresh}
           onToggleAutoRefresh={toggleAutoRefresh}
@@ -779,7 +689,7 @@ function ProcManager() {
       )}
       {view === "ports" && (
         <PortsView
-          key={refreshTrigger}
+          key={refreshKey}
           filter={filter}
           autoRefresh={autoRefresh}
           onToggleAutoRefresh={toggleAutoRefresh}
@@ -791,14 +701,14 @@ function ProcManager() {
         <ProcessDetailView
           process={selectedProcess}
           onBack={handleBackFromDetail}
-          onRefresh={triggerRefresh}
+          onRefresh={handleBackFromDetail}
         />
       )}
       {view === "detail" && selectedPort && (
         <PortDetailView
           port={selectedPort}
           onBack={handleBackFromDetail}
-          onRefresh={triggerRefresh}
+          onRefresh={handleBackFromDetail}
         />
       )}
     </App>

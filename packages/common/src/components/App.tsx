@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { Box, Text, useApp, useInput, render as inkRender } from "ink";
 import { ActionBar, ActionItem } from "./ActionBar.js";
 

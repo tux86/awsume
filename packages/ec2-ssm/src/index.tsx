@@ -91,12 +91,19 @@ async function listEC2Instances(ec2: EC2Client, ssm: SSMClient): Promise<EC2Inst
   return instances.filter((i) => i.ssmOnline).sort((a, b) => a.name.localeCompare(b.name));
 }
 
-function startSSMSession(instanceId: string, profile?: string, region?: string): void {
+function startSSMSession(
+  instanceId: string,
+  profile?: string,
+  region?: string,
+  onExit?: () => void
+): void {
   const args = ["ssm", "start-session", "--target", instanceId];
   if (profile) args.push("--profile", profile);
   if (region) args.push("--region", region);
 
-  spawn("aws", args, { stdio: "inherit" });
+  const proc = spawn("aws", args, { stdio: "inherit" });
+  proc.on("close", () => onExit?.());
+  proc.on("error", () => onExit?.());
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -157,7 +164,9 @@ function EC2SSM() {
 
     // Small delay to show connecting message
     setTimeout(() => {
-      startSSMSession(instance.instanceId, profile, region);
+      startSSMSession(instance.instanceId, profile, region, () => {
+        setConnecting(null);
+      });
     }, 100);
   };
 

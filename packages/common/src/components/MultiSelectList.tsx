@@ -30,6 +30,11 @@ export function MultiSelectList({
   const [scrollOffset, setScrollOffset] = useState(0);
   const { isFocused } = useFocus({ autoFocus: true });
 
+  // Clamp cursor when items change
+  useEffect(() => {
+    setCursor((prev) => Math.min(prev, Math.max(0, items.length - 1)));
+  }, [items.length]);
+
   // Handle scrolling
   useEffect(() => {
     if (cursor < scrollOffset) {
@@ -84,7 +89,7 @@ export function MultiSelectList({
       }
 
       // Cancel
-      if (key.escape || (input === "q" && !key.ctrl)) {
+      if (key.escape) {
         onCancel?.();
       }
     },

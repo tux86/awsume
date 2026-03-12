@@ -1,5 +1,6 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect } from "react";
 import { Box, Text, useInput, useFocus } from "ink";
+import { Spinner } from "./Spinner.js";
 
 export interface ListItemData {
   id: string;
@@ -110,7 +111,7 @@ export function List({
   );
 
   if (loading) {
-    return null;
+    return <Spinner label="Loading..." />;
   }
 
   if (items.length === 0) {

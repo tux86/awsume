@@ -226,15 +226,18 @@ All tools support these common shortcuts:
 | `↑/↓` or `j/k` | Navigate |
 | `Enter` | Select |
 | `r` | Refresh |
-| `q` | Quit |
-| `b` | Back |
+| `b` or `Escape` | Back |
 | `c` | Copy |
+| `q` | Quit |
 
 Multi-select lists also support:
+
 | Key | Action |
 |-----|--------|
 | `Space` | Toggle selection |
 | `a` | Select all/none |
+| `Enter` | Submit |
+| `Escape` | Cancel |
 
 ## Contributing
 

@@ -354,19 +354,19 @@ async function pollForToken(
           expiresAt,
         };
       }
-    } catch (error: unknown) {
-      const err = error as { name?: string };
-      if (err.name === "AuthorizationPendingException") {
+    } catch (error) {
+      const errName = error instanceof Error ? error.name : "";
+      if (errName === "AuthorizationPendingException") {
         // User hasn't authorized yet, keep polling
         await new Promise((resolve) => setTimeout(resolve, deviceAuth.interval * 1000));
         continue;
       }
-      if (err.name === "SlowDownException") {
+      if (errName === "SlowDownException") {
         // Need to slow down polling
         await new Promise((resolve) => setTimeout(resolve, (deviceAuth.interval + 5) * 1000));
         continue;
       }
-      if (err.name === "ExpiredTokenException" || err.name === "AccessDeniedException") {
+      if (errName === "ExpiredTokenException" || errName === "AccessDeniedException") {
         return null;
       }
       // Unknown error, stop polling
