@@ -51,15 +51,6 @@
         "message": "chore(release): ${nextRelease.version} [skip ci]\n\n${nextRelease.notes}"
       }
     ],
-    [
-      "@semantic-release/github",
-      {
-        "assets": [
-          { "path": "dist/ssomatic-linux-x64.bin", "label": "ssomatic-linux-x64" },
-          { "path": "dist/ssomatic-linux-arm64.bin", "label": "ssomatic-linux-arm64" },
-          { "path": "dist/ssomatic-darwin-arm64.bin", "label": "ssomatic-darwin-arm64" }
-        ]
-      }
-    ]
+    "@semantic-release/github"
   ]
 }
