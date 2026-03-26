@@ -1,7 +1,9 @@
 {
   "name": "@toolbox/ec2-ssm",
   "version": "3.0.0",
+  "description": "Interactive TUI for connecting to EC2 instances via SSM",
   "type": "module",
+  "license": "MIT",
   "bin": {
     "ec2-ssm": "./src/index.tsx"
   },

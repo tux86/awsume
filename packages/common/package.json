@@ -1,7 +1,9 @@
 {
   "name": "@toolbox/common",
   "version": "3.0.0",
+  "description": "Shared React/Ink components and utilities for Toolbox CLI tools",
   "type": "module",
+  "license": "MIT",
   "main": "./src/index.ts",
   "types": "./src/index.ts",
   "exports": {

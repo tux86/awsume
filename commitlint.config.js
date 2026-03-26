@@ -27,6 +27,7 @@ export default {
         'secrets-view',
         'proc-manager',
         'common',
+        'gui',
         'deps',
       ],
     ],

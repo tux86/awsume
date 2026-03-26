@@ -1,7 +1,14 @@
 {
   "name": "toolbox",
+  "description": "AWS utility tools with modern React/Ink terminal UI",
   "private": true,
   "type": "module",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/tux86/toolbox.git"
+  },
+  "author": "tux86",
   "workspaces": [
     "packages/*"
   ],
@@ -10,6 +17,7 @@
     "ec2-ssm": "bun run --cwd packages/ec2-ssm start",
     "secrets-view": "bun run --cwd packages/secrets-view start",
     "proc-manager": "bun run --cwd packages/proc-manager start",
+    "gui": "bun run --cwd packages/gui dev",
     "build": "bun run build:aws-creds && bun run build:ec2-ssm && bun run build:secrets-view && bun run build:proc-manager",
     "build:aws-creds": "bun run --cwd packages/aws-creds build",
     "build:ec2-ssm": "bun run --cwd packages/ec2-ssm build",

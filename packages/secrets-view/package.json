@@ -1,7 +1,9 @@
 {
   "name": "@toolbox/secrets-view",
   "version": "3.0.0",
+  "description": "Interactive TUI for browsing AWS Secrets Manager secrets",
   "type": "module",
+  "license": "MIT",
   "bin": {
     "secrets-view": "./src/index.tsx"
   },

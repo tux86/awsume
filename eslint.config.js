@@ -48,6 +48,16 @@ export default [
     },
   },
   {
-    ignores: ["node_modules", "dist", "*.config.js"],
+    files: ["packages/gui/src/**/*.{ts,tsx}"],
+    languageOptions: {
+      globals: {
+        window: "readonly",
+        document: "readonly",
+        HTMLElement: "readonly",
+      },
+    },
+  },
+  {
+    ignores: ["node_modules", "dist", "*.config.js", "packages/gui/out", "packages/gui/.next"],
   },
 ];
