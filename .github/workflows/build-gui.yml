@@ -1,0 +1,93 @@
+name: Build GUI
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - "@awsume/gui@*"
+
+jobs:
+  build:
+    name: Build (${{ matrix.platform }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: macos-latest
+            platform: mac-arm64
+            server-target: bun-darwin-arm64
+          - os: macos-13
+            platform: mac-x64
+            server-target: bun-darwin-x64
+          - os: ubuntu-latest
+            platform: linux-x64
+            server-target: bun-linux-x64
+          - os: windows-latest
+            platform: win-x64
+            server-target: bun-windows-x64
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: bun install
+
+      - name: Build Electron & Vite
+        working-directory: packages/gui
+        run: |
+          bun run scripts/build-electron.ts --server-target=${{ matrix.server-target }}
+          bunx vite build
+
+      - name: Build distributables
+        working-directory: packages/gui
+        run: bunx electron-builder --config electron-builder.yml --publish never
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: awsume-gui-${{ matrix.platform }}
+          path: |
+            packages/gui/release/*.dmg
+            packages/gui/release/*.zip
+            packages/gui/release/*.exe
+            packages/gui/release/*.AppImage
+            packages/gui/release/*.deb
+          if-no-files-found: warn
+          retention-days: 30
+
+  release:
+    name: Create Release
+    needs: build
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/')
+    permissions:
+      contents: write
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+          merge-multiple: true
+
+      - name: List artifacts
+        run: find artifacts -type f || true
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: artifacts/**
+          generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

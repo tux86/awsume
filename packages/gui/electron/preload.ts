@@ -4,7 +4,7 @@ import type {
   SSOProfile,
   DeviceAuthInfo,
   AppSettings,
-} from "@toolbox/aws-creds/core";
+} from "@awsume/core";
 
 export interface ElectronAPI {
   discoverProfiles: () => Promise<SSOProfile[]>;

@@ -1,0 +1,43 @@
+appId: com.tux86.awsume
+productName: Awsume
+copyright: Copyright (c) 2024-present tux86
+
+directories:
+  output: release
+  buildResources: build
+
+files:
+  - dist-electron/**/*
+  - dist-renderer/**/*
+  - package.json
+
+extraResources:
+  - from: dist-server/
+    to: .
+    filter:
+      - "**/*"
+
+mac:
+  target:
+    - target: dmg
+    - target: zip
+  category: public.app-category.developer-tools
+  hardenedRuntime: true
+  entitlements: build/entitlements.mac.plist
+  entitlementsInherit: build/entitlements.mac.plist
+
+win:
+  target:
+    - target: nsis
+
+nsis:
+  oneClick: false
+  allowToChangeInstallationDirectory: true
+
+linux:
+  target:
+    - target: AppImage
+    - target: deb
+  category: Development
+
+publish: null

@@ -13,9 +13,19 @@ var rpcId = 0;
 var pendingRequests = new Map;
 function startBunServer() {
   return new Promise((resolve, reject) => {
-    const serverScript = isDev ? path.join(__dirname2, "..", "electron", "server.ts") : path.join(__dirname2, "server.js");
-    const bunPath = process.env.BUN_PATH || "bun";
-    bunServer = spawn(bunPath, ["run", serverScript], {
+    let cmd;
+    let args;
+    if (isDev) {
+      const serverScript = path.join(__dirname2, "..", "electron", "server.ts");
+      const bunPath = process.env.BUN_PATH || "bun";
+      cmd = bunPath;
+      args = ["run", serverScript];
+    } else {
+      const ext = process.platform === "win32" ? ".exe" : "";
+      cmd = path.join(process.resourcesPath, `server${ext}`);
+      args = [];
+    }
+    bunServer = spawn(cmd, args, {
       stdio: ["pipe", "pipe", "pipe"],
       cwd: isDev ? path.join(__dirname2, "..") : __dirname2
     });

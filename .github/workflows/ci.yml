@@ -27,21 +27,16 @@ jobs:
 
       - name: Syntax check
         run: |
-          bun -e "import './packages/common/src/index.ts'"
-          bun -e "import './packages/aws-creds/src/index.tsx'" 2>/dev/null || true
-          bun -e "import './packages/ec2-ssm/src/index.tsx'" 2>/dev/null || true
-          bun -e "import './packages/secrets-view/src/index.tsx'" 2>/dev/null || true
+          bun -e "import './packages/core/src/index.ts'"
+          bun -e "import './packages/cli/src/index.tsx'" 2>/dev/null || true
 
-      - name: Build binaries
+      - name: Build binary
         run: bun run build
 
-      - name: Verify binaries
+      - name: Verify binary
         run: |
           ls -lh dist/
-          test -f dist/aws-creds
-          test -f dist/ec2-ssm
-          test -f dist/secrets-view
-          test -f dist/proc-manager
+          test -f dist/awsume
 
       - name: Validate commitlint config
         if: github.event_name == 'pull_request'

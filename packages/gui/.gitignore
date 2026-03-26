@@ -1,0 +1,8 @@
+# Compiled server binary (built per-platform in CI)
+dist-server/
+
+# electron-builder output
+release/
+
+# Allow build resources (entitlements, icons)
+!build/

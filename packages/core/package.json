@@ -1,7 +1,7 @@
 {
-  "name": "@toolbox/common",
-  "version": "3.0.0",
-  "description": "Shared React/Ink components and utilities for Toolbox CLI tools",
+  "name": "@awsume/core",
+  "version": "1.0.0",
+  "description": "Shared UI components, hooks, and AWS credential logic for Awsume",
   "type": "module",
   "license": "MIT",
   "main": "./src/index.ts",
@@ -10,12 +10,16 @@
     ".": "./src/index.ts"
   },
   "dependencies": {
+    "@aws-sdk/client-sso": "^3.958.0",
+    "@aws-sdk/client-sso-oidc": "^3.958.0",
     "@aws-sdk/client-sts": "^3.700.0",
+    "ini": "^5.0.0",
     "ink": "^6.0.0",
     "ink-spinner": "^5.0.0",
     "react": "^19.0.0"
   },
   "devDependencies": {
+    "@types/ini": "^4.1.1",
     "@types/react": "^19.0.0",
     "bun-types": "latest"
   }

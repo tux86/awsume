@@ -22,11 +22,8 @@ export default {
       1,
       'always',
       [
-        'aws-creds',
-        'ec2-ssm',
-        'secrets-view',
-        'proc-manager',
-        'common',
+        'core',
+        'cli',
         'gui',
         'deps',
       ],

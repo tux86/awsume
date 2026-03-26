@@ -24,7 +24,7 @@ jobs:
       - name: Install dependencies
         run: bun install
 
-      - name: Build binaries
+      - name: Build binary
         run: bun run build
 
       - name: Create Release Pull Request or Tag
@@ -49,21 +49,22 @@ jobs:
             version=$(echo "$pkg" | base64 -d | jq -r '.version')
             tag="${name}@${version}"
 
-            # Extract package short name (e.g., @toolbox/aws-creds -> aws-creds)
-            short_name=$(echo "$name" | sed 's/@toolbox\///')
-            binary="dist/${short_name}"
+            short_name=$(echo "$name" | sed 's/@awsume\///')
 
-            echo "Processing release for $tag (binary: $binary)"
+            echo "Processing release for $tag"
 
-            # Check if release exists
+            if [ "$short_name" = "cli" ]; then
+              binary="dist/awsume"
+            else
+              binary=""
+            fi
+
             if gh release view "$tag" > /dev/null 2>&1; then
-              echo "Release exists, uploading binary..."
-              if [ -f "$binary" ]; then
+              if [ -n "$binary" ] && [ -f "$binary" ]; then
                 gh release upload "$tag" "$binary" --clobber
               fi
             else
-              echo "Creating new release..."
-              if [ -f "$binary" ]; then
+              if [ -n "$binary" ] && [ -f "$binary" ]; then
                 gh release create "$tag" "$binary" --generate-notes --title "$tag"
               else
                 gh release create "$tag" --generate-notes --title "$tag"

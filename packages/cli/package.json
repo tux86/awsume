@@ -1,0 +1,26 @@
+{
+  "name": "@awsume/cli",
+  "version": "1.0.0",
+  "description": "Interactive terminal UI for managing AWS credentials",
+  "type": "module",
+  "license": "MIT",
+  "exports": {
+    ".": "./src/index.tsx"
+  },
+  "bin": {
+    "awsume": "./src/index.tsx"
+  },
+  "scripts": {
+    "start": "bun run ./src/index.tsx",
+    "build": "bun build --compile ./src/index.tsx --outfile ../../dist/awsume"
+  },
+  "dependencies": {
+    "@awsume/core": "workspace:*",
+    "ink": "^6.0.0",
+    "react": "^19.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.0.0",
+    "bun-types": "latest"
+  }
+}

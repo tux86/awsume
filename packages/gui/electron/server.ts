@@ -19,7 +19,7 @@ import {
   type SSOProfile,
   type DeviceAuthInfo,
   type AppSettings,
-} from "@toolbox/aws-creds/core";
+} from "@awsume/core";
 
 interface RpcRequest {
   id: number;

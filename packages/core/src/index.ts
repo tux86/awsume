@@ -1,5 +1,5 @@
 /**
- * @toolbox/common - Shared React/Ink components for CLI tools
+ * @awsume/core - Shared UI components, hooks, and AWS credential logic
  */
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -73,3 +73,48 @@ export {
 // ─────────────────────────────────────────────────────────────────────────────
 
 export { copyToClipboard, formatJson } from "./utils.js";
+
+// ─────────────────────────────────────────────────────────────────────────────
+// AWS Credentials Manager (business logic)
+// ─────────────────────────────────────────────────────────────────────────────
+
+export {
+  // Types
+  type SSOProfile,
+  type CredentialStatus,
+  type ProfileStatus,
+  type AWSCredentials,
+  type DeviceAuthInfo,
+  type AppSettings,
+  type TokenInfo,
+  // Constants
+  HOME,
+  AWS_DIR,
+  CONFIG_PATH,
+  CREDENTIALS_PATH,
+  SSO_CACHE_DIR,
+  SETTINGS_PATH,
+  // Constants
+  DEFAULT_SETTINGS,
+  REFRESH_INTERVALS,
+  // Functions
+  parseIniFile,
+  writeCredentials,
+  discoverProfiles,
+  checkTokenStatus,
+  checkAllProfiles,
+  refreshProfile,
+  startDeviceAuthorization,
+  saveSSOTokenToCache,
+  pollForToken,
+  performSSOLoginFlow,
+  getCredentialsWithToken,
+  loadSettings,
+  saveSettings,
+  sendNotification,
+  openBrowser,
+  formatExpiry,
+  getStatusColor,
+  sortByFavorites,
+  findCachedToken,
+} from "./aws-creds.js";

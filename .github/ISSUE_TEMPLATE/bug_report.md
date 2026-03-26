@@ -1,18 +1,15 @@
 ---
 name: Bug Report
-about: Report a bug in one of the Toolbox packages
+about: Report a bug in Awsume
 title: "[bug] "
 labels: bug
 ---
 
 ## Package
 
-- [ ] `@toolbox/aws-creds`
-- [ ] `@toolbox/ec2-ssm`
-- [ ] `@toolbox/secrets-view`
-- [ ] `@toolbox/proc-manager`
-- [ ] `@toolbox/gui`
-- [ ] `@toolbox/common`
+- [ ] `@awsume/core`
+- [ ] `@awsume/cli`
+- [ ] `@awsume/gui`
 
 ## Description
 
@@ -36,4 +33,4 @@ What actually happened.
 
 - OS: [e.g., macOS 15, Ubuntu 24.04]
 - Bun version: [e.g., 1.3.11]
-- Package version: [e.g., 1.2.0]
+- Package version: [e.g., 1.0.0]

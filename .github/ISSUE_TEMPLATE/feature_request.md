@@ -7,13 +7,9 @@ labels: enhancement
 
 ## Package
 
-- [ ] `@toolbox/aws-creds`
-- [ ] `@toolbox/ec2-ssm`
-- [ ] `@toolbox/secrets-view`
-- [ ] `@toolbox/proc-manager`
-- [ ] `@toolbox/gui`
-- [ ] `@toolbox/common`
-- [ ] New package
+- [ ] `@awsume/core`
+- [ ] `@awsume/cli`
+- [ ] `@awsume/gui`
 
 ## Description
 

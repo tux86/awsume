@@ -1,7 +1,7 @@
 {
-  "name": "@toolbox/gui",
+  "name": "@awsume/gui",
   "version": "1.0.0",
-  "description": "Electron desktop app for Toolbox",
+  "description": "Electron desktop app for Awsume",
   "type": "module",
   "license": "MIT",
   "main": "dist-electron/main.js",
@@ -10,11 +10,11 @@
     "dev:vite": "vite",
     "dev:electron": "sleep 2 && electron dist-electron/main.js",
     "build:electron": "bun run scripts/build-electron.ts",
-    "build": "bun run build:electron && vite build && electron-builder",
+    "build": "bun run build:electron && vite build && electron-builder --config electron-builder.yml",
     "preview": "vite preview"
   },
   "dependencies": {
-    "@toolbox/aws-creds": "workspace:*",
+    "@awsume/core": "workspace:*",
     "react": "19.2.3",
     "react-dom": "19.2.3"
   },

@@ -21,12 +21,23 @@ const pendingRequests = new Map<number, { resolve: (v: unknown) => void; reject:
 
 function startBunServer(): Promise<void> {
   return new Promise((resolve, reject) => {
-    const serverScript = isDev
-      ? path.join(__dirname, "..", "electron", "server.ts")
-      : path.join(__dirname, "server.js");
+    let cmd: string;
+    let args: string[];
 
-    const bunPath = process.env.BUN_PATH || "bun";
-    bunServer = spawn(bunPath, ["run", serverScript], {
+    if (isDev) {
+      // Dev: run TypeScript source with Bun
+      const serverScript = path.join(__dirname, "..", "electron", "server.ts");
+      const bunPath = process.env.BUN_PATH || "bun";
+      cmd = bunPath;
+      args = ["run", serverScript];
+    } else {
+      // Prod: use compiled standalone binary from resources
+      const ext = process.platform === "win32" ? ".exe" : "";
+      cmd = path.join(process.resourcesPath, `server${ext}`);
+      args = [];
+    }
+
+    bunServer = spawn(cmd, args, {
       stdio: ["pipe", "pipe", "pipe"],
       cwd: isDev ? path.join(__dirname, "..") : __dirname,
     });

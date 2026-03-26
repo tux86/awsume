@@ -6,6 +6,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { Box, Text, useApp, useInput } from "ink";
 import {
+  // UI Components
   App,
   renderApp,
   List,
@@ -17,8 +18,7 @@ import {
   useCopy,
   type ListItemData,
   type MultiSelectItemData,
-} from "@toolbox/common";
-import {
+  // Credential Logic
   type SSOProfile,
   type ProfileStatus,
   type DeviceAuthInfo,
@@ -37,7 +37,7 @@ import {
   formatExpiry,
   getStatusColor,
   sortByFavorites,
-} from "./core.js";
+} from "@awsume/core";
 
 type ViewState =
   | "menu"

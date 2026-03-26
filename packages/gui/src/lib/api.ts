@@ -4,7 +4,7 @@
  * that Vite can't resolve (they use Bun APIs / Electron).
  */
 
-// ─── Types (mirrored from @toolbox/aws-creds/core) ─────────────────────────
+// ─── Types (mirrored from @awsume/core) ─────────────────────────────────────
 
 export interface SSOProfile {
   name: string;
