@@ -79,12 +79,13 @@ const DIST_DIR = path.join(import.meta.dir, "../../dist/web");
 
 let server: ReturnType<typeof Bun.serve> | null = null;
 
-export function startServer(port?: number): string {
+export function startServer(port?: number): string | null {
   if (server) return `http://127.0.0.1:${server.port}`;
 
   const resolvedPort = port ?? parseInt(process.env.SSOMATIC_PORT || String(DEFAULT_PORT));
 
-  server = Bun.serve({
+  try {
+    server = Bun.serve({
     port: resolvedPort,
     hostname: "127.0.0.1",
 
@@ -119,9 +120,13 @@ export function startServer(port?: number): string {
 
       return new Response("Not Found", { status: 404 });
     },
-  });
+    });
 
-  return `http://127.0.0.1:${server.port}`;
+    return `http://127.0.0.1:${server.port}`;
+  } catch {
+    server = null;
+    return null;
+  }
 }
 
 export function stopServer(): void {

@@ -539,8 +539,10 @@ function SSOmatic() {
         updateSettings({ webServer: false });
       } else {
         const url = startServer(settings.webPort);
-        setWebUrl(url);
-        updateSettings({ webServer: true });
+        if (url) {
+          setWebUrl(url);
+          updateSettings({ webServer: true });
+        }
       }
     }
   });
@@ -668,7 +670,7 @@ function SSOmatic() {
       stopServer();
       await updateSettings({ webPort: newPort });
       const url = startServer(newPort);
-      setWebUrl(url);
+      setWebUrl(url ?? null);
     } else {
       await updateSettings({ webPort: newPort });
     }
