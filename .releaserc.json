@@ -55,7 +55,9 @@
       "@semantic-release/github",
       {
         "assets": [
-          { "path": "dist/ssomatic", "label": "ssomatic (Linux/macOS binary)" }
+          { "path": "dist/ssomatic-linux-x64.bin", "label": "ssomatic-linux-x64" },
+          { "path": "dist/ssomatic-linux-arm64.bin", "label": "ssomatic-linux-arm64" },
+          { "path": "dist/ssomatic-darwin-arm64.bin", "label": "ssomatic-darwin-arm64" }
         ]
       }
     ]
