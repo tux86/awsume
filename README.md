@@ -38,7 +38,6 @@ Interactive AWS SSO credential manager with CLI and web UI.
 
 ## Prerequisites
 
-- [Bun](https://bun.sh) >= 1.0
 - [AWS CLI v2](https://aws.amazon.com/cli/) configured with SSO profiles in `~/.aws/config`
 
 ## Install
@@ -49,40 +48,48 @@ Interactive AWS SSO credential manager with CLI and web UI.
 brew install tux86/tap/ssomatic
 ```
 
+### Download binary
+
+Grab the latest binary for your platform from [Releases](https://github.com/tux86/ssomatic/releases):
+
+| Platform | Binary |
+|----------|--------|
+| macOS (Apple Silicon) | `ssomatic-darwin-arm64.bin` |
+| Linux (x64) | `ssomatic-linux-x64.bin` |
+| Linux (ARM64) | `ssomatic-linux-arm64.bin` |
+
+```bash
+chmod +x ssomatic-*.bin
+mv ssomatic-*.bin /usr/local/bin/ssomatic
+```
+
 ### From source
+
+Requires [Bun](https://bun.sh) >= 1.0.
 
 ```bash
 git clone https://github.com/tux86/ssomatic.git
 cd ssomatic
 bun install
-bun run start
+bun run build
+./dist/ssomatic
 ```
 
 ## Usage
 
 ```bash
-bun run start         # Run the CLI
+ssomatic                # Launch the CLI
+```
+
+Press `w` to toggle the built-in web UI server. The URL is shown at the bottom of the terminal. Web server state and port are saved in settings.
+
+## Development
+
+```bash
+bun run start         # Run from source
 bun run dev           # Run with --watch (auto-restart on changes)
 bun run build         # Build web assets + compiled binary
 bun run lint          # Run ESLint
-```
-
-Press `w` inside the CLI to toggle the web UI server. The URL is shown at the bottom of the terminal. The web server state and port are saved in settings.
-
-## Building
-
-```bash
-bun run build
-
-# Output:
-#   dist/ssomatic      — standalone CLI binary
-#   dist/web/           — web UI assets (served by the built-in web server)
-```
-
-### Global Installation
-
-```bash
-ln -s $(pwd)/dist/ssomatic ~/.local/bin/ssomatic
 ```
 
 ## Project Structure
