@@ -1,3 +1,9 @@
+## [1.1.0](https://github.com/tux86/ssomatic/compare/v1.0.1...v1.1.0) (2026-03-26)
+
+### Features
+
+* add Homebrew tap with auto-update on release ([8e9adfe](https://github.com/tux86/ssomatic/commit/8e9adfe822a2742901e80fbdb0d91831ccaac098))
+
 ## [1.0.1](https://github.com/tux86/ssomatic/compare/v1.0.0...v1.0.1) (2026-03-26)
 
 ### Bug Fixes
