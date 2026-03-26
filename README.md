@@ -41,7 +41,15 @@ Interactive AWS SSO credential manager with CLI and web UI.
 - [Bun](https://bun.sh) >= 1.0
 - [AWS CLI v2](https://aws.amazon.com/cli/) configured with SSO profiles in `~/.aws/config`
 
-## Getting Started
+## Install
+
+### Homebrew (macOS / Linux)
+
+```bash
+brew install tux86/tap/ssomatic
+```
+
+### From source
 
 ```bash
 git clone https://github.com/tux86/ssomatic.git

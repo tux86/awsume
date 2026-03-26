@@ -90,7 +90,71 @@ jobs:
           ls -lh dist/*.bin
 
       - name: Run semantic-release
+        id: release
         run: npx semantic-release
         env:
           GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
           HUSKY: "0"
+
+      - name: Update Homebrew tap
+        if: steps.release.outcome == 'success'
+        env:
+          GH_TOKEN: ${{ secrets.RELEASE_TOKEN }}
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+          echo "Updating Homebrew formula to v${VERSION}"
+
+          # Download binaries and compute SHA256
+          gh release download "v${VERSION}" --repo tux86/ssomatic --dir /tmp/bins --clobber
+          SHA_DARWIN_ARM64=$(sha256sum /tmp/bins/ssomatic-darwin-arm64.bin | cut -d' ' -f1)
+          SHA_LINUX_X64=$(sha256sum /tmp/bins/ssomatic-linux-x64.bin | cut -d' ' -f1)
+          SHA_LINUX_ARM64=$(sha256sum /tmp/bins/ssomatic-linux-arm64.bin | cut -d' ' -f1)
+
+          # Clone tap and update formula
+          git clone "https://x-access-token:${GH_TOKEN}@github.com/tux86/homebrew-tap.git" /tmp/tap
+          cd /tmp/tap
+
+          cat > Formula/ssomatic.rb << FORMULA
+          class Ssomatic < Formula
+            desc "Interactive AWS SSO credential manager with CLI and web UI"
+            homepage "https://github.com/tux86/ssomatic"
+            version "${VERSION}"
+            license "MIT"
+
+            on_macos do
+              on_arm do
+                url "https://github.com/tux86/ssomatic/releases/download/v#{version}/ssomatic-darwin-arm64.bin"
+                sha256 "${SHA_DARWIN_ARM64}"
+              end
+            end
+
+            on_linux do
+              on_intel do
+                url "https://github.com/tux86/ssomatic/releases/download/v#{version}/ssomatic-linux-x64.bin"
+                sha256 "${SHA_LINUX_X64}"
+              end
+              on_arm do
+                url "https://github.com/tux86/ssomatic/releases/download/v#{version}/ssomatic-linux-arm64.bin"
+                sha256 "${SHA_LINUX_ARM64}"
+              end
+            end
+
+            def install
+              binary = Dir["ssomatic-*"].first
+              bin.install binary => "ssomatic"
+            end
+
+            test do
+              assert_match "SSOmatic", shell_output("#{bin}/ssomatic --help 2>&1", 1)
+            end
+          end
+          FORMULA
+
+          # Remove leading spaces from heredoc
+          sed -i 's/^          //' Formula/ssomatic.rb
+
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add Formula/ssomatic.rb
+          git commit -m "chore: update ssomatic to v${VERSION}"
+          git push
