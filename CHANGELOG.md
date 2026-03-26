@@ -1,3 +1,9 @@
+## [1.2.1](https://github.com/tux86/ssomatic/compare/v1.2.0...v1.2.1) (2026-03-26)
+
+### Bug Fixes
+
+* **cli:** separate status bar and action bar with individual dividers ([ddc19ae](https://github.com/tux86/ssomatic/commit/ddc19ae9efe20ed279b7c4a359a6241ef066541f))
+
 ## [1.2.0](https://github.com/tux86/ssomatic/compare/v1.1.1...v1.2.0) (2026-03-26)
 
 ### Features
