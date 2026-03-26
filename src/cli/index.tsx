@@ -39,6 +39,7 @@ import {
   sortByFavorites,
 } from "../aws/sso.js";
 import { startServer, stopServer, isServerRunning } from "../web/server.js";
+import { VERSION, checkForUpdate } from "../version.js";
 
 type ViewState =
   | "menu"
@@ -516,7 +517,13 @@ function SSOmatic() {
   const [selectedProfiles, setSelectedProfiles] = useState<SSOProfile[]>([]);
   const [daemonInterval, setDaemonInterval] = useState(30);
   const [webUrl, setWebUrl] = useState<string | null>(null);
+  const [updateAvailable, setUpdateAvailable] = useState<string | null>(null);
   const { exit } = useApp();
+
+  // Check for updates
+  useEffect(() => {
+    checkForUpdate().then(setUpdateAvailable);
+  }, []);
 
   // Auto-start web server from saved settings
   useEffect(() => {
@@ -924,7 +931,7 @@ function SSOmatic() {
 
   return (
     <App
-      title="SSOmatic"
+      title={`SSOmatic v${VERSION}`}
       icon="🔐"
       color="cyan"
       actions={getActions()}
@@ -943,19 +950,28 @@ function SSOmatic() {
 
       {renderView()}
 
-      {/* Web server status */}
-      <Box marginTop={1}>
-        {webUrl ? (
-          <Text>
-            <Text color="green">●</Text>
-            <Text dimColor> Web UI: </Text>
-            <Text color="cyan">{webUrl}</Text>
-          </Text>
-        ) : (
-          <Text dimColor>
-            <Text color="gray">○</Text>
-            {" Web UI: off"}
-          </Text>
+      {/* Status footer */}
+      <Box marginTop={1} flexDirection="column">
+        <Box>
+          {webUrl ? (
+            <Text>
+              <Text color="green">●</Text>
+              <Text dimColor> Web UI: </Text>
+              <Text color="cyan">{webUrl}</Text>
+            </Text>
+          ) : (
+            <Text dimColor>
+              <Text color="gray">○</Text>
+              {" Web UI: off"}
+            </Text>
+          )}
+        </Box>
+        {updateAvailable && (
+          <Box>
+            <Text color="yellow">
+              Update available: v{updateAvailable} (current: v{VERSION}) — brew upgrade ssomatic
+            </Text>
+          </Box>
         )}
       </Box>
     </App>

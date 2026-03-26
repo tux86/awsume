@@ -17,6 +17,7 @@ import {
   type DeviceAuthInfo,
   type AppSettings,
 } from "../aws/sso.js";
+import { VERSION, checkForUpdate } from "../version.js";
 import path from "path";
 
 const DEFAULT_PORT = 9876;
@@ -72,6 +73,11 @@ const methods: Record<string, (...args: unknown[]) => Promise<unknown>> = {
   "send-notification": async (title: unknown, message: unknown) => {
     await sendNotification(title as string, message as string);
     return { ok: true };
+  },
+
+  "get-version": async () => {
+    const latest = await checkForUpdate();
+    return { current: VERSION, latest };
   },
 };
 

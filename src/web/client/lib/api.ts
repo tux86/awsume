@@ -82,6 +82,8 @@ export const api = {
     window.open(url, "_blank");
   },
 
+  getVersion: () => rpc<{ current: string; latest: string | null }>("get-version"),
+
   sendNotification: (title: string, message: string) => {
     if (Notification.permission === "granted") {
       new Notification(title, { body: message });

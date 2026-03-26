@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
+import { api } from "../lib/api";
 
 type View = "dashboard" | "refresh" | "daemon" | "settings";
 
@@ -66,6 +67,12 @@ function NavIcon({ icon }: { icon: string }) {
 }
 
 export function Sidebar({ active, onChange, profileCount }: SidebarProps) {
+  const [version, setVersion] = useState<{ current: string; latest: string | null } | null>(null);
+
+  useEffect(() => {
+    api.getVersion().then(setVersion);
+  }, []);
+
   return (
     <aside className="w-52 h-full flex flex-col bg-white/[0.02]">
       {/* Logo */}
@@ -80,6 +87,9 @@ export function Sidebar({ active, onChange, profileCount }: SidebarProps) {
             <span className="font-semibold text-[13px] text-text-primary tracking-tight">
               SSOmatic
             </span>
+            {version && (
+              <span className="text-[10px] text-text-muted ml-1.5">v{version.current}</span>
+            )}
           </div>
         </div>
       </div>
@@ -115,7 +125,14 @@ export function Sidebar({ active, onChange, profileCount }: SidebarProps) {
       </nav>
 
       {/* Footer */}
-      <div className="px-5 py-4">
+      <div className="px-5 py-4 flex flex-col gap-2">
+        {version?.latest && (
+          <div className="px-2.5 py-1.5 rounded-lg bg-yellow-500/10 border border-yellow-500/20">
+            <span className="text-[10px] text-yellow-400 font-medium">
+              v{version.latest} available
+            </span>
+          </div>
+        )}
         <div className="flex items-center gap-2">
           <div className="w-2 h-2 rounded-full bg-status-valid animate-pulse-dot" />
           <span className="text-[10.5px] text-text-muted">
