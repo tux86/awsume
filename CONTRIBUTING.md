@@ -53,23 +53,16 @@ type(scope): description
 
 Commits are validated by [commitlint](https://commitlint.js.org/) via a Git hook.
 
-## Changesets
+## Releases
 
-After user-facing changes, **always add a changeset**:
-
-```bash
-bun run changeset
-```
-
-**Bump types:** `patch` (bug fixes), `minor` (new features), `major` (breaking changes)
+Releases are fully automated via [semantic-release](https://semantic-release.gitbook.io/). When commits land on `main`, the CI pipeline determines the version bump from commit types (`feat` → minor, `fix` → patch) and creates a GitHub release with the binary attached. No manual steps needed.
 
 ## Pull Request Process
 
 1. Fork the repo and create a branch from `main`
 2. Make your changes with conventional commits
-3. Add a changeset if the change is user-facing
-4. Ensure `bun run lint` passes
-5. Open a PR using the provided template
+3. Ensure `bun run lint` passes
+4. Open a PR using the provided template
 
 ## Code Style
 

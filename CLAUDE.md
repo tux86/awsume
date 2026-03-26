@@ -32,6 +32,7 @@ ssomatic/
 │   ├── ssomatic               # Compiled CLI binary
 │   └── web/                   # Vite build output
 ├── docs/screenshots/          # Demo GIFs for README
+├── .releaserc.json            # semantic-release config
 ├── package.json
 ├── tsconfig.json              # Server/CLI TypeScript config
 ├── tsconfig.web.json          # Web client TypeScript config (DOM libs)
@@ -51,6 +52,7 @@ ssomatic/
 | Vite | Web UI dev server & bundler |
 | Tailwind CSS | Web UI styling |
 | ESLint | Linting (flat config) |
+| semantic-release | Automated versioning & releases |
 
 ## Commands
 
@@ -75,18 +77,16 @@ bun run lint          # Run ESLint
 ### Conventional Commits (enforced by commitlint)
 
 ```bash
-feat(cli): add profile filtering      # New feature
-fix(aws): handle empty clipboard       # Bug fix
-docs: update README                    # Documentation
-build(deps): upgrade aws-sdk           # Dependencies
+feat(cli): add profile filtering      # New feature → minor bump
+fix(aws): handle empty clipboard       # Bug fix → patch bump
+docs: update README                    # No release
+build(deps): upgrade aws-sdk           # No release
 ```
 
 **Allowed scopes:** `cli`, `web`, `aws`, `deps`, `ci`
 
-### Changesets
+### Releases
 
-After user-facing changes, always add a changeset:
+Fully automated via **semantic-release**. Push to `main` with conventional commits → CI passes → version bumped, CHANGELOG.md updated, GitHub release created with binary attached. No manual steps.
 
-```bash
-bun run changeset
-```
+**Requires:** `RELEASE_TOKEN` secret in GitHub repo settings (PAT with `contents: write` scope).

@@ -110,7 +110,7 @@ ssomatic/
 - [Code of Conduct](CODE_OF_CONDUCT.md)
 - [Security Policy](SECURITY.md)
 
-Uses [Conventional Commits](https://www.conventionalcommits.org/) and [Changesets](https://github.com/changesets/changesets).
+Uses [Conventional Commits](https://www.conventionalcommits.org/) and [semantic-release](https://semantic-release.gitbook.io/).
 
 ## License
 
