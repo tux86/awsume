@@ -25,9 +25,6 @@ jobs:
       - name: Lint
         run: bun run lint
 
-      - name: Syntax check
-        run: bun -e "import './src/cli/index.tsx'"
-
       - name: Build
         run: bun run build
 
