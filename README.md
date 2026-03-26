@@ -7,10 +7,6 @@ Interactive AWS SSO credential manager with CLI and web UI.
 [![Bun](https://img.shields.io/badge/Bun-%23000000.svg?logo=bun&logoColor=white)](https://bun.sh)
 [![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 
-<p align="center">
-  <img src="demo.gif" alt="SSOmatic Demo" width="560">
-</p>
-
 ---
 
 ## Features
@@ -22,6 +18,20 @@ Interactive AWS SSO credential manager with CLI and web UI.
 - **Built-in web UI** — Toggle a web server from the CLI with `w` for a browser-based dashboard
 - **Desktop notifications** — Alerts when credentials expire (macOS/Linux)
 - **Persistent settings** — Notifications, favorites, web server, port — all saved across sessions
+
+## Demo
+
+### CLI
+
+<p align="center">
+  <img src="docs/screenshots/cli-demo.gif" alt="SSOmatic CLI Demo" width="720">
+</p>
+
+### Web UI
+
+<p align="center">
+  <img src="docs/screenshots/web-demo.gif" alt="SSOmatic Web UI Demo" width="720">
+</p>
 
 ## Prerequisites
 
